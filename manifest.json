@@ -1,0 +1,6 @@
+{
+  "name": "websocket",
+  "short_name": "websocket",
+  "start_url": "/",
+  "display": "standalone"
+}
