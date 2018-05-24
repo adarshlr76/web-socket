@@ -25,6 +25,7 @@ class VisionWebsocket extends PolymerElement {
         type: Boolean,
         value: false
       },
+      
       wsBroker: {
         type: String,
         value: location.hostname,
@@ -35,6 +36,7 @@ class VisionWebsocket extends PolymerElement {
         value: (location.protocol == "https:") ? 443 : 15675,
         notify: true
       },
+  
       wsUsername: {
         type: String,
         value: 'vision',
@@ -84,7 +86,7 @@ class VisionWebsocket extends PolymerElement {
   connectedCallback() {
     if (this.auto) {
       this._createWebSocket();
-    }
+    } 
   }
 
   disconnectedCallback() {

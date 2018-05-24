@@ -101,42 +101,14 @@ class VisionAlarm extends PolymerElement {
 
     <vision-websocket id="vws" auto current-state="{{currentState}}" subscribe-to="/ui/camera" subscribe-from="/camera/ui" response="{{response}}">
     </vision-websocket>
-    <button on-click="_sendMessage">Click me</button> 
-    <div class="view-root">
-      <div class="alarms-container">
-        <div class="alarms-frame" >
-          <!-- Load alarms and toggle more alarms -->
-          <template is="dom-repeat" items="{{alarmArray}}" restamp="true">
-            <!-- Row 1 -->
-            <div class="alarms-frame-row">
-              
-              <div class="alarms-frame-col alarms-icon">
-                <span>
-                  <i class="abb_icon_16 ui_warning_triangle"></i>
-                </span>
-              </div>
-              <div class="alarms-frame-col alarms-title">
-                <span>
-                  [[item.message]]
-                </span>
-              </div>
-              <div class="alarms-frame-col alarms-ack">
-                <div class="alarms-ack-btn" id="[[alarmId]]" on-click="_acknowledgeAlarm">ACK</div>
-              </div>
-            </div>
-          </template>
-            <!-- Row 2 -->
-          <div class="alarms-frame-row">
-            <div class="alarms-frame-col alarms-icon"></div>
-            <div class="alarms-frame-col alarms-view-all viewAll" on-click="_loadPage">
-                <span>View all alarms</span>
-            </div>
-            <div class="alarms-frame-col alarms-ack"></div>
-          </div>
-
-        </div>
-      </div>
-
+    <vision-websocket id="vws2" auto current-state="{{currentState2}}" subscribe-to="/ui/alarm" subscribe-from="/alarm/ui" response="{{response2}}">
+    </vision-websocket>
+    
+    <button on-click="_sendMessage">Click Camera</button> <br>
+    output {{output}} <br>
+    <button on-click="_sendMessage2">Click Alarm</button> <br>
+    output2 {{output2}}
+  
     `;
   }
   static get is() { return 'vision-alarm'; }
@@ -153,12 +125,25 @@ class VisionAlarm extends PolymerElement {
         reflectToAttribute: true,
         observer: '_responseChanged',
       },
+      response2: {
+        type: Object,
+        notify: true,
+        reflectToAttribute: true,
+        observer: '_responseChanged2',
+      },      
       currentState: {
         type: Boolean,
         notify: true,
         reflectToAttribute: true,
         observer: '_stateChanged',
       },
+      currentState2: {
+        type: Boolean,
+        notify: true,
+        reflectToAttribute: true,
+        observer: '_stateChanged2',
+      },
+       
       hideDropdown: {
         type: Boolean,
         value: true,
@@ -181,6 +166,15 @@ class VisionAlarm extends PolymerElement {
           return []
         }
       },
+      output: {
+          type : String,
+          notify:true
+      },
+      output2: {
+        type : String,
+        notify:true
+    },
+    
       alarmId: {
         type: String
       },
@@ -199,21 +193,43 @@ class VisionAlarm extends PolymerElement {
 
     //client.send(message);
   }
+  _sendMessage2() {
+    //message = new Paho.MQTT.Message("data");
+    //message.destinationName = "/ui/camera";
+    this.$.vws2._sendMessage( "{ 'name': 'abc123' }");
+
+    //client.send(message);
+  }
+  
   _hello() {
       console.log("hello");
 
   }
 
   _responseChanged(response) {
-    this.set('alarmArray', JSON.parse(response.payloadString));
-    this.alarmCount = this.alarmArray.length;
+    console.log(response.payloadString);
+    this.set('output', response.payloadString);
+    //this.alarmCount = this.alarmArray.length;
   }
+  _responseChanged2(response2) {
+    console.log(response2.payloadString);
+    this.set('output2', response2.payloadString);
+    //this.alarmCount = this.alarmArray.length;
+  }
+  
   _stateChanged(currentState) {
     if (!currentState) {
       this.$.vws._createWebSocket();
       this.currentState = true;
     }
   }
+  _stateChanged2(currentState2) {
+    if (!currentState2) {
+      this.$.vws2._createWebSocket();
+      this.currentState2 = true;
+    }
+  }
+  
   _valueChanged(hideDropdown)
   { 
     if(hideDropdown)
